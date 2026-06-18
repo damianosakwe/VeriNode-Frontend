@@ -2,6 +2,7 @@
 
 import React, {
   createContext,
+  useContext,
   useCallback,
   useContext,
   useEffect,
@@ -13,6 +14,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { WalletAccount, WalletProviderType } from '@/src/types/wallet';
 import { clearAllCaches } from '@/src/lib/reactQuery';
 
+interface WalletProviders {
+  freighter?: { isConnected: () => boolean }
+  lobstr?: { isConnected: () => boolean }
+  xbull?: { isConnected: () => boolean }
+  albedo?: { isConnected: () => boolean }
+}
+
 interface WalletContextValue {
   activeAccount: WalletAccount | null;
   isConnected: boolean;
@@ -21,6 +29,8 @@ interface WalletContextValue {
   walletType: WalletProviderType | null;
   connect: () => Promise<void>;
   disconnect: () => void;
+  walletType: WalletProviderType | null;
+  providers: WalletProviders;
 }
 
 export const WalletContext = createContext<WalletContextValue>({
@@ -31,6 +41,8 @@ export const WalletContext = createContext<WalletContextValue>({
   walletType: null,
   connect: async () => {},
   disconnect: () => {},
+  walletType: null,
+  providers: {},
 });
 
 export function useWalletContext() {
@@ -98,6 +110,25 @@ function detectProvider(): WalletProviderType | null {
   if (window.webln) return 'lobstr';
   if (window.albedo) return 'albedo';
   return null;
+}
+
+function getWalletProviders(): WalletProviders {
+  if (typeof window === 'undefined') return {};
+  const w = window as unknown as Record<string, unknown>;
+  return {
+    freighter: w.freighterApi ? { isConnected: () => true } : undefined,
+    lobstr: w.lobstr ? { isConnected: () => true } : undefined,
+    xbull: w.xbull ? { isConnected: () => true } : undefined,
+    albedo: w.albedo ? { isConnected: () => true } : undefined,
+  };
+}
+
+export function useWalletContext() {
+  const context = useContext(WalletContext);
+  if (!context) {
+    throw new Error('useWalletContext must be used within a WalletProvider');
+  }
+  return context;
 }
 
 function captureBreadcrumb(previousKey: string | null, newKey: string | null, flushDuration: number, cacheEntriesInvalidated: number) {
