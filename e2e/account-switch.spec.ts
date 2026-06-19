@@ -26,7 +26,7 @@ test.describe('Wallet account switching - race condition prevention', () => {
       window.stellarWeb3 = {
         isConnected: async () => ({ isConnected: true }),
         getPublicKey: async () => accounts[currentAccountIndex],
-        signTransaction: async (tx: string) => tx,
+        signTransaction: async (tx: string) => ({ signedTx: tx }),
       };
 
       window.__mockSwitchAccount = (index: number) => {
