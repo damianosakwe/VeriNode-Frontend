@@ -15,12 +15,12 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: '**/wallet-tests/**',
+      testIgnore: ['**/wallet-tests/**'],
     },
     {
       name: 'wallet-ci',
-      testMatch: '**/wallet-tests/walletFlows.spec.ts',
       use: { ...devices['Desktop Chrome'] },
+      testMatch: /wallet-tests.*\.spec\.ts$/,
     },
   ],
   webServer: {

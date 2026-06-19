@@ -181,7 +181,7 @@ test.describe('Wallet E2E - Staking Operations', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: '100',
-          publicKey: 'GDFVYP2HTPCFMQO7PZ6EPN4MI5QT4LUN2GAEZGPUV5LH3MBVB3IMO6AB',
+          publicKey: 'GD3ZBMG2A2R7JWNBVVDD4VGMFFYYI46KSEMKN5ZBJAMWE67LAVRIM6GS',
         }),
       });
       return await response.json();
@@ -201,7 +201,7 @@ test.describe('Wallet E2E - Staking Operations', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: '50',
-          publicKey: 'GDFVYP2HTPCFMQO7PZ6EPN4MI5QT4LUN2GAEZGPUV5LH3MBVB3IMO6AB',
+          publicKey: 'GD3ZBMG2A2R7JWNBVVDD4VGMFFYYI46KSEMKN5ZBJAMWE67LAVRIM6GS',
         }),
       });
       return await response.json();
@@ -216,7 +216,7 @@ test.describe('Wallet E2E - Staking Operations', () => {
     await page.goto('/');
 
     const balance = await page.evaluate(async () => {
-      const response = await fetch('/api/staking/GDFVYP2HTPCFMQO7PZ6EPN4MI5QT4LUN2GAEZGPUV5LH3MBVB3IMO6AB');
+      const response = await fetch('/api/staking/GD3ZBMG2A2R7JWNBVVDD4VGMFFYYI46KSEMKN5ZBJAMWE67LAVRIM6GS');
       return await response.json();
     });
 
@@ -277,7 +277,7 @@ test.describe('Wallet E2E - Node Registration', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nodeUrl: 'https://node.example.com',
-          publicKey: 'GDFVYP2HTPCFMQO7PZ6EPN4MI5QT4LUN2GAEZGPUV5LH3MBVB3IMO6AB',
+          publicKey: 'GD3ZBMG2A2R7JWNBVVDD4VGMFFYYI46KSEMKN5ZBJAMWE67LAVRIM6GS',
         }),
       });
       return await response.json();
@@ -399,7 +399,7 @@ test.describe('Wallet E2E - Account Switching', () => {
 
     // Fetch data for account1
     await page.evaluate(async () => {
-      await fetch('/api/staking/GDFVYP2HTPCFMQO7PZ6EPN4MI5QT4LUN2GAEZGPUV5LH3MBVB3IMO6AB');
+      await fetch('/api/staking/GD3ZBMG2A2R7JWNBVVDD4VGMFFYYI46KSEMKN5ZBJAMWE67LAVRIM6GS');
     });
 
     // Switch to account2
@@ -423,7 +423,7 @@ test.describe('Wallet E2E - Account Switching', () => {
         // Trigger another switch to capture the event
         window.dispatchEvent(
           new CustomEvent('stellar-wallet:accountChange', {
-            detail: { publicKey: 'GAOLGFVD6XP5LWHJI7GKQC54DW4ZV7VLFOXE252HMUYLEBC4OZCIZHI4' },
+            detail: { publicKey: 'GAGRDGQR5H7I5HMYO5DKGGI4HYCYVNGKZXAFMSNFW2ICD67OOXCBCHDB' },
           })
         );
       });

@@ -9,9 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
-    "test:e2e:wallet": "playwright test e2e/wallet-tests/walletFlows.spec.ts",
-    "test:e2e:wallet:headed": "playwright test e2e/wallet-tests/walletFlows.spec.ts --headed",
-    "test:e2e:wallet:debug": "playwright test e2e/wallet-tests/walletFlows.spec.ts --debug",
+    "test:e2e:wallet": "playwright test --project=wallet-ci",
+    "test:e2e:wallet:headed": "playwright test --project=wallet-ci --headed",
+    "test:e2e:wallet:debug": "playwright test --project=wallet-ci --debug",
     "test:e2e:ci": "playwright test --project=wallet-ci"
   },
   "dependencies": {

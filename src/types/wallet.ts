@@ -21,7 +21,9 @@ declare global {
     stellarWeb3?: {
       isConnected: () => Promise<{ isConnected: boolean }>;
       getPublicKey: () => Promise<string>;
-      signTransaction: (tx: string) => Promise<string>;
+      signTransaction: (tx: string) => Promise<{ signedTx: string }>;
+      signMessage?: (message: string) => Promise<{ signature: string }>;
+      getNetwork?: () => Promise<'testnet' | 'public'>;
     };
     webln?: {
       getPublicKey: () => Promise<string>;
