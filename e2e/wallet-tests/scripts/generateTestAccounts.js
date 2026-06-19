@@ -3,6 +3,7 @@
  * Run with: node e2e/wallet-tests/scripts/generateTestAccounts.js
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { Keypair } = require('@stellar/stellar-sdk');
 
 const accountNames = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'];

@@ -18,16 +18,9 @@ export interface MockWalletOptions {
 /**
  * Simple mock signing function that returns a deterministic signature
  * In a real implementation, this would use the Stellar SDK to properly sign
+ * Note: This is inlined in addInitScript, not called directly from this module
  */
-function mockSign(data: string, secret: string): string {
-  // Create a deterministic "signature" based on data and secret
-  // This is NOT cryptographically valid - just for testing UI flows
-  const hash = Array.from(data + secret).reduce(
-    (hash, char) => ((hash << 5) - hash) + char.charCodeAt(0),
-    0
-  );
-  return `MOCK_SIG_${Math.abs(hash).toString(16).toUpperCase().padStart(64, '0')}`;
-}
+// Removed unused mockSign function - signing logic is inlined in page.addInitScript
 
 /**
  * Injects a mock Freighter wallet into the page context
@@ -130,7 +123,7 @@ export async function injectMockWallet(
       };
 
       // Store mock account info for debugging
-      (window as any).__mockWalletAccount = account;
+      (window as unknown as { __mockWalletAccount: typeof account }).__mockWalletAccount = account;
     },
     { account, isConnected, network, simulateNetworkError }
   );
@@ -176,7 +169,7 @@ export async function injectMockWalletWithSwitching(
       };
 
       // Helper function to switch accounts
-      (window as any).__mockSwitchAccount = (index: number) => {
+      (window as unknown as { __mockSwitchAccount: (index: number) => void }).__mockSwitchAccount = (index: number) => {
         if (index >= 0 && index < accounts.length) {
           currentAccountIndex = index;
           window.dispatchEvent(
@@ -187,7 +180,7 @@ export async function injectMockWalletWithSwitching(
         }
       };
 
-      (window as any).__mockWalletAccounts = accounts;
+      (window as unknown as { __mockWalletAccounts: typeof accounts }).__mockWalletAccounts = accounts;
     },
     { accounts, initialIndex: initialAccountIndex }
   );
@@ -200,15 +193,17 @@ export async function injectMockWalletWithSwitching(
 export async function resetStores(page: Page): Promise<void> {
   await page.evaluate(() => {
     // Reset auth store
-    if ((window as any).useAuthStore) {
-      const authStore = (window as any).useAuthStore.getState();
-      if (authStore.logout) authStore.logout();
+    const authStore = (window as unknown as { useAuthStore?: { getState: () => { logout?: () => void } } }).useAuthStore;
+    if (authStore) {
+      const state = authStore.getState();
+      if (state.logout) state.logout();
     }
 
     // Reset staking store
-    if ((window as any).useStakingStore) {
-      const stakingStore = (window as any).useStakingStore.getState();
-      if (stakingStore.reset) stakingStore.reset();
+    const stakingStore = (window as unknown as { useStakingStore?: { getState: () => { reset?: () => void } } }).useStakingStore;
+    if (stakingStore) {
+      const state = stakingStore.getState();
+      if (state.reset) state.reset();
     }
 
     // Clear localStorage

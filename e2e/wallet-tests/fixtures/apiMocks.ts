@@ -45,7 +45,7 @@ export const mockSettings = {
   theme: 'dark',
 };
 
-export const mockSettingsUpdate = (settings: Record<string, any>) => ({
+export const mockSettingsUpdate = (settings: Record<string, unknown>) => ({
   success: true,
   updated: settings,
 });
