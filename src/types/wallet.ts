@@ -16,6 +16,16 @@ export interface WalletEventMap {
   'stellar-wallet:accountChange': CustomEvent<{ publicKey: string }>;
 }
 
+export interface AuthChallenge {
+  nonce: string;
+  serverId: string;
+  expiresAt: number;
+}
+
+export interface AuthSession {
+  expiresAt: number;
+}
+
 declare global {
   interface Window {
     stellarWeb3?: {
@@ -26,6 +36,10 @@ declare global {
       getNetwork?: () => Promise<'testnet' | 'public'>;
     };
     webln?: {
+      getPublicKey: () => Promise<string>;
+      signTransaction: (tx: string) => Promise<string>;
+    };
+    xbull?: {
       getPublicKey: () => Promise<string>;
       signTransaction: (tx: string) => Promise<string>;
     };

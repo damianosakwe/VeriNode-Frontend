@@ -241,7 +241,8 @@ export async function setupAPIMocks(page: Page): Promise<void> {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        challenge: 'mock_challenge_' + Date.now(),
+        nonce: 'mock_nonce_' + Date.now(),
+        serverId: 'mock_server_id',
         expiresAt: Date.now() + 300000, // 5 minutes
       }),
     });
@@ -256,6 +257,36 @@ export async function setupAPIMocks(page: Page): Promise<void> {
         token: 'mock_jwt_token_' + Date.now(),
         expiresAt: Date.now() + 3600000, // 1 hour
       }),
+    });
+  });
+
+  // Mock session check endpoint
+  await page.route('**/api/v1/auth/session', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        valid: true,
+        expiresAt: Date.now() + 3600000, // 1 hour
+      }),
+    });
+  });
+
+  // Mock logout endpoint
+  await page.route('**/api/v1/auth/logout', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true }),
+    });
+  });
+
+  // Mock heartbeat endpoint (for session watcher)
+  await page.route('**/api/v1/auth/heartbeat', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
     });
   });
 
