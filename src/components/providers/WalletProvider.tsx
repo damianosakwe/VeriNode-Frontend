@@ -90,6 +90,7 @@ function detectProvider(): WalletProviderType | null {
   if (typeof window === 'undefined') return null;
   if (window.stellarWeb3) return 'freighter';
   if (window.webln) return 'lobstr';
+  if (window.xbull) return 'xbull';
   if (window.albedo) return 'albedo';
   return null;
 }

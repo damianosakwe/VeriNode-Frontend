@@ -4,7 +4,9 @@ interface AuthStore {
   isAuthenticated: boolean
   walletType: string | null
   walletAddress: string | null
-  login: (walletType: string, walletAddress: string) => void
+  sessionExpiresAt: number | null
+  login: (walletType: string, walletAddress: string, sessionExpiresAt: number) => void
+  setSessionExpiry: (expiresAt: number) => void
   logout: () => void
 }
 

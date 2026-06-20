@@ -18,7 +18,7 @@ test.describe("Session Watcher — Wallet Disconnect Detection", () => {
     await page.evaluate(() => {
       const stores = (window as Record<string, unknown>)
         .__TEST_STORES__ as Record<string, { getState: () => { login: (a: string, b: string) => void } }>
-      stores.auth.getState().login("freighter", "GABCDEF123...")
+      stores.auth.getState().login("freighter", "GABCDEF123...", Date.now() + 3600000)
     })
   })
 

@@ -3,7 +3,8 @@
  */
 
 export const mockAuthChallenge = {
-  challenge: 'mock_challenge_' + Date.now(),
+  nonce: 'mock_nonce_' + Date.now(),
+  serverId: 'mock_server_id',
   expiresAt: Date.now() + 300000, // 5 minutes
 };
 
