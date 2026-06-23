@@ -62,7 +62,7 @@ function setFilter(state: TestState, partial: Partial<FilterState>): TestState {
 
 function setUserInteracting(state: TestState, interacting: boolean): TestState {
   if (!interacting && state.pendingQueue.length > 0) {
-    let nodes = [...state.nodes];
+    const nodes = [...state.nodes];
     for (const update of state.pendingQueue) {
       const idx = nodes.findIndex((n) => n.id === update.nodeId);
       if (idx !== -1) nodes[idx] = { ...nodes[idx], status: update.status };

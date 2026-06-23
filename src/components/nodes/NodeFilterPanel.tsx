@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useNodeStore, type NodeStatus, type FilterState } from '@/src/store/nodeStore';
+import { useNodeStore, type FilterState } from '@/src/store/nodeStore';
 import { useFilter } from '@/src/hooks/useNodeList';
 
 const STATUS_OPTIONS: Array<{ value: FilterState['status']; label: string }> = [

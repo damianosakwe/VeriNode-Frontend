@@ -70,7 +70,7 @@ export const useNodeStore = create<NodeStore>((set, get) => ({
     })),
 
   updateNodeStatus: (nodeId, newStatus) => {
-    const { isUserInteracting, nodes } = get();
+    const { isUserInteracting } = get();
 
     // If user is actively interacting, queue the update instead
     if (isUserInteracting) {
