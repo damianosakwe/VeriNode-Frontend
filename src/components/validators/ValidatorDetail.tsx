@@ -3,13 +3,17 @@
 import { useMemo, useState } from 'react'
 import { SyncCommitteeHeatmap } from '@/src/components/canvas/SyncCommitteeHeatmap'
 import { SyncCommitteeSummary } from '@/src/components/validators/SyncCommitteeSummary'
+import { DelayHistogram } from '@/src/components/canvas/DelayHistogram'
+import { EpochRangeSelector } from '@/src/components/validators/EpochRangeSelector'
 import { useSyncCommitteeHistory } from '@/src/hooks/useSyncCommitteeHistory'
+import { useAttestationInclusion, MIN_SPAN } from '@/src/hooks/useAttestationInclusion'
 
-type TabKey = 'overview' | 'sync-committee'
+type TabKey = 'overview' | 'sync-committee' | 'attestation'
 
 const TABS: Array<{ key: TabKey; label: string }> = [
   { key: 'overview', label: 'Overview' },
   { key: 'sync-committee', label: 'Sync Committee' },
+  { key: 'attestation', label: 'Attestation' },
 ]
 
 /**
@@ -27,6 +31,10 @@ export function ValidatorDetail({
   const [tab, setTab] = useState<TabKey>('sync-committee')
   const history = useSyncCommitteeHistory(validatorIndex, { beaconNodeUrl })
   const { periods, currentPeriod, loadPeriod } = history
+
+  const attestation = useAttestationInclusion(validatorIndex, { beaconNodeUrl })
+  const inclusion = attestation.histogram
+  const within1Slot = inclusion ? inclusion.percentages[0] + inclusion.percentages[1] : 0
 
   const [selectedPeriod, setSelectedPeriod] = useState<number | null>(null)
 
@@ -130,6 +138,52 @@ export function ValidatorDetail({
           </section>
         </div>
       )}
+
+      {tab === 'attestation' && (
+        <div className="space-y-6">
+          <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-white">
+            <div className="mb-5">
+              <h2 className="text-xl font-semibold">Attestation Effectiveness</h2>
+              <p className="text-sm text-slate-400">
+                Validator #{validatorIndex} · inclusion delay summary
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+              <Metric label="Mean delay" value={inclusion ? `${inclusion.meanDelay.toFixed(2)} slots` : '—'} />
+              <Metric label="Within 1 slot" value={inclusion ? `${within1Slot.toFixed(1)}%` : '—'} />
+              <Metric label="Attestations" value={inclusion ? inclusion.total.toLocaleString() : '—'} />
+              <Metric label="Epoch range" value={`${attestation.range[0]}–${attestation.range[1]}`} />
+            </div>
+          </section>
+
+          <section className="space-y-5 rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-white">
+            <h3 className="text-lg font-semibold">Inclusion delay distribution</h3>
+            <EpochRangeSelector
+              min={attestation.minEpoch}
+              max={attestation.maxEpoch}
+              value={attestation.range}
+              minSpan={MIN_SPAN}
+              onChange={attestation.setRange}
+            />
+            <DelayHistogram
+              histogram={attestation.histogram}
+              fromEpoch={attestation.range[0]}
+              toEpoch={attestation.range[1]}
+              isComputing={attestation.isComputing}
+            />
+            {attestation.error && <p className="text-sm text-red-400">{attestation.error}</p>}
+          </section>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Metric({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3">
+      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 font-semibold text-slate-100">{value}</p>
     </div>
   )
 }
