@@ -9,7 +9,7 @@ import {
 } from '@/src/types/committee'
 import { computeConcentration } from '@/src/utils/concentrationRisk'
 import { loadEpochHistory, saveEpochAssignments } from '@/src/services/committeeHistoryStore'
-import { useCommitteeStore } from '@/src/store/committeeSlice'
+import { useShardCommitteeStore } from '@/src/store/shardCommitteeSlice'
 import { currentEpoch, epochStartMs } from '@/src/utils/epochTime'
 
 const DEFAULT_HISTORY_DEPTH = 32
@@ -92,11 +92,11 @@ export function useCommitteeAssignments(
 ): CommitteeAssignmentsState {
   const { beaconNodeUrl, historyDepth = DEFAULT_HISTORY_DEPTH } = options
 
-  const byEpoch = useCommitteeStore((s) => s.byEpoch)
-  const latestEpoch = useCommitteeStore((s) => s.latestEpoch)
-  const setEpochAssignments = useCommitteeStore((s) => s.setEpochAssignments)
-  const setHistory = useCommitteeStore((s) => s.setHistory)
-  const getValidatorTimeline = useCommitteeStore((s) => s.getValidatorTimeline)
+  const byEpoch = useShardCommitteeStore((s) => s.byEpoch)
+  const latestEpoch = useShardCommitteeStore((s) => s.latestEpoch)
+  const setEpochAssignments = useShardCommitteeStore((s) => s.setEpochAssignments)
+  const setHistory = useShardCommitteeStore((s) => s.setHistory)
+  const getValidatorTimeline = useShardCommitteeStore((s) => s.getValidatorTimeline)
 
   const [viewEpoch, setViewEpoch] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)

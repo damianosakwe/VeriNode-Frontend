@@ -1,71 +1,77 @@
 import { create } from 'zustand'
-import { RETENTION_EPOCHS, type EpochAssignments } from '@/src/types/committee'
+import {
+  computeParticipationRate,
+  type SyncCommitteePeriodData,
+} from '@/src/utils/syncCommittee'
 
-/**
- * In-memory store for sharded committee assignments, mirroring the IndexedDB
- * history and bounded to the most recent RETENTION_EPOCHS (256) epochs.
- */
-interface CommitteeState {
-  byEpoch: Record<number, EpochAssignments>
-  latestEpoch: number | null
-  setEpochAssignments: (data: EpochAssignments) => void
-  setHistory: (epochs: EpochAssignments[]) => void
-  getEpochs: () => number[]
-  /** Shard a validator was assigned to per epoch (ascending by epoch). */
-  getValidatorTimeline: (validatorIndex: number) => Array<{ epoch: number; shard: number }>
-  reset: () => void
+type RequestStatus = 'idle' | 'loading' | 'loaded' | 'error'
+
+function statusKey(validatorIndex: number, period: number): string {
+  return `${validatorIndex}:${period}`
 }
 
-function prune(byEpoch: Record<number, EpochAssignments>): Record<number, EpochAssignments> {
-  const epochs = Object.keys(byEpoch)
-    .map(Number)
-    .sort((a, b) => a - b)
-  if (epochs.length <= RETENTION_EPOCHS) return byEpoch
-  const drop = epochs.slice(0, epochs.length - RETENTION_EPOCHS)
-  const next = { ...byEpoch }
-  for (const e of drop) delete next[e]
-  return next
+interface CommitteeState {
+  /** periodsByValidator[validatorIndex][period] = data */
+  periodsByValidator: Record<number, Record<number, SyncCommitteePeriodData>>
+  /** Per (validator, period) request status. */
+  status: Record<string, RequestStatus>
+  /** Per (validator, period) error message. */
+  errors: Record<string, string>
+
+  setStatus: (validatorIndex: number, period: number, status: RequestStatus, error?: string) => void
+  setPeriod: (data: SyncCommitteePeriodData) => void
+  getPeriods: (validatorIndex: number) => SyncCommitteePeriodData[]
+  getAggregateRate: (validatorIndex: number) => number
+  reset: (validatorIndex: number) => void
 }
 
 export const useCommitteeStore = create<CommitteeState>((set, get) => ({
-  byEpoch: {},
-  latestEpoch: null,
+  periodsByValidator: {},
+  status: {},
+  errors: {},
 
-  setEpochAssignments: (data) =>
-    set((s) => {
-      const byEpoch = prune({ ...s.byEpoch, [data.epoch]: data })
-      return {
-        byEpoch,
-        latestEpoch: Math.max(s.latestEpoch ?? data.epoch, data.epoch),
-      }
-    }),
+  setStatus: (validatorIndex, period, status, error) =>
+    set((s) => ({
+      status: { ...s.status, [statusKey(validatorIndex, period)]: status },
+      errors:
+        error === undefined
+          ? s.errors
+          : { ...s.errors, [statusKey(validatorIndex, period)]: error },
+    })),
 
-  setHistory: (epochs) =>
-    set(() => {
-      const byEpoch: Record<number, EpochAssignments> = {}
-      for (const ea of epochs) byEpoch[ea.epoch] = ea
-      const pruned = prune(byEpoch)
-      const keys = Object.keys(pruned).map(Number)
-      return {
-        byEpoch: pruned,
-        latestEpoch: keys.length ? Math.max(...keys) : null,
-      }
-    }),
+  setPeriod: (data) =>
+    set((s) => ({
+      periodsByValidator: {
+        ...s.periodsByValidator,
+        [data.validatorIndex]: {
+          ...(s.periodsByValidator[data.validatorIndex] ?? {}),
+          [data.period]: data,
+        },
+      },
+      status: { ...s.status, [statusKey(data.validatorIndex, data.period)]: 'loaded' },
+    })),
 
-  getEpochs: () =>
-    Object.keys(get().byEpoch)
-      .map(Number)
-      .sort((a, b) => a - b),
-
-  getValidatorTimeline: (validatorIndex) => {
-    const { byEpoch } = get()
-    const timeline: Array<{ epoch: number; shard: number }> = []
-    for (const epoch of Object.keys(byEpoch).map(Number).sort((a, b) => a - b)) {
-      const found = byEpoch[epoch].assignments.find((a) => a.validatorIndex === validatorIndex)
-      if (found) timeline.push({ epoch, shard: found.shard })
-    }
-    return timeline
+  getPeriods: (validatorIndex) => {
+    const byPeriod = get().periodsByValidator[validatorIndex]
+    if (!byPeriod) return []
+    return Object.values(byPeriod).sort((a, b) => a.period - b.period)
   },
 
-  reset: () => set({ byEpoch: {}, latestEpoch: null }),
+  getAggregateRate: (validatorIndex) => {
+    const periods = get().getPeriods(validatorIndex).filter((p) => p.assigned)
+    let participated = 0
+    let total = 0
+    for (const p of periods) {
+      participated += p.participatedCount
+      total += p.totalSlots
+    }
+    return computeParticipationRate(participated, total)
+  },
+
+  reset: (validatorIndex) =>
+    set((s) => {
+      const periodsByValidator = { ...s.periodsByValidator }
+      delete periodsByValidator[validatorIndex]
+      return { periodsByValidator }
+    }),
 }))
