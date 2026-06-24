@@ -45,9 +45,8 @@ export function useNodeList(): NodeInfo[] {
   const snapshot = useSyncExternalStore(subscribeToStore, getStoreSnapshot);
 
   // Memoized filtered list — only invalidated when both versions change
+  const { nodes, filter, dataVersion, filterVersion } = snapshot;
   const filtered = useMemo(() => {
-    const { nodes, filter } = snapshot;
-
     return nodes.filter((node) => {
       // Status filter
       if (filter.status !== 'all' && node.status !== filter.status) {
@@ -67,7 +66,7 @@ export function useNodeList(): NodeInfo[] {
 
       return true;
     });
-  }, [snapshot.dataVersion, snapshot.filterVersion, snapshot.nodes, snapshot.filter]);
+  }, [dataVersion, filterVersion, nodes, filter]);
 
   return filtered;
 }
