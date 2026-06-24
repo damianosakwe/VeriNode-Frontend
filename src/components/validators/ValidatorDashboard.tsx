@@ -8,6 +8,7 @@ import { CommitteeTopologyMap } from '@/src/components/canvas/CommitteeTopologyM
 import { ShardLegend } from '@/src/components/validators/ShardLegend'
 import { useValidatorBalances } from '@/src/hooks/useValidatorBalances'
 import { useCommitteeAssignments } from '@/src/hooks/useCommitteeAssignments'
+import { StakingCalculator } from '@/src/components/validators/StakingCalculator'
 
 const DEFAULT_VALIDATORS = [100, 101, 102, 103, 104, 105]
 
@@ -36,6 +37,7 @@ export function ValidatorDashboard({
 
   return (
     <div className="space-y-6">
+      <StakingCalculator />
       <section className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 text-white">
         <button
           type="button"
