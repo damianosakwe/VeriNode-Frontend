@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { InspectionForm } from '@/src/components/inspections/InspectionForm'
 import { SyncStatusBar } from '@/src/components/SyncStatusBar'
+import { ThemeSwitcher } from '@/src/components/ui/ThemeSwitcher'
 import { FinalityHealthGauge } from '@/src/components/validators/FinalityHealthGauge'
 import { DVTClusterList } from '@/src/components/validators/DVTClusterList'
 import { useFinalityCheckpoints } from '@/src/hooks/useFinalityCheckpoints'
@@ -38,6 +39,10 @@ export default function Home() {
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
           Physical node inspection — data is cached locally and synced when online.
         </p>
+
+        <div className="mb-6">
+          <ThemeSwitcher />
+        </div>
 
         <div className="mb-6">
           <FinalityHealthGauge snapshot={finalityHealth} />
