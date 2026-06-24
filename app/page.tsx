@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { InspectionForm } from '@/src/components/inspections/InspectionForm'
 import { SyncStatusBar } from '@/src/components/SyncStatusBar'
+import { FinalityHealthGauge } from '@/src/components/validators/FinalityHealthGauge'
+import { useFinalityCheckpoints } from '@/src/hooks/useFinalityCheckpoints'
 import { syncManager } from '@/src/services/syncManager'
 import { initializeEncryption, hasEncryptionKey } from '@/src/services/crypto'
 
@@ -16,6 +18,8 @@ const inspectionFields = [
 ]
 
 export default function Home() {
+  const finalityHealth = useFinalityCheckpoints()
+
   useEffect(() => {
     if (!hasEncryptionKey()) {
       initializeEncryption('default-pin-0000').catch(console.error)
@@ -33,6 +37,10 @@ export default function Home() {
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
           Physical node inspection — data is cached locally and synced when online.
         </p>
+
+        <div className="mb-6">
+          <FinalityHealthGauge snapshot={finalityHealth} />
+        </div>
 
         <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <InspectionForm fields={inspectionFields} />
