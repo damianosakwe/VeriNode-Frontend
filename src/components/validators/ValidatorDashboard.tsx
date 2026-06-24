@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { BalanceReconciliationTable } from '@/src/components/validators/BalanceReconciliationTable'
 import { ValidatorUnlockCard } from '@/src/components/validators/ValidatorUnlockCard'
+import { ExitQueuePositionCard } from '@/src/components/validators/ExitQueuePositionCard'
 import { useValidatorBalances } from '@/src/hooks/useValidatorBalances'
 
 const DEFAULT_VALIDATORS = [100, 101, 102, 103, 104, 105]
@@ -20,6 +21,7 @@ export function ValidatorDashboard({
   beaconNodeUrl?: string
 }) {
   const [open, setOpen] = useState(true)
+  const [queueOpen, setQueueOpen] = useState(true)
   const { byValidator } = useValidatorBalances(validatorIndices, { beaconNodeUrl })
 
   const cappedValidators = useMemo(
@@ -64,6 +66,33 @@ export function ValidatorDashboard({
                 </div>
               </div>
             )}
+          </div>
+        )}
+      </section>
+
+      <section className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 text-white">
+        <button
+          type="button"
+          onClick={() => setQueueOpen((o) => !o)}
+          className="flex w-full items-center justify-between gap-4 p-6 text-left"
+          aria-expanded={queueOpen}
+        >
+          <div>
+            <h2 className="text-xl font-semibold">Exit Queue</h2>
+            <p className="text-sm text-slate-400">
+              Queue position &amp; projected exit ETA · {validatorIndices.length} validators
+            </p>
+          </div>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-lg text-slate-300">
+            {queueOpen ? '−' : '+'}
+          </span>
+        </button>
+
+        {queueOpen && (
+          <div className="grid gap-4 px-6 pb-6 sm:grid-cols-2">
+            {validatorIndices.map((vi) => (
+              <ExitQueuePositionCard key={vi} validatorIndex={vi} beaconNodeUrl={beaconNodeUrl} />
+            ))}
           </div>
         )}
       </section>
