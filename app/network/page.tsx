@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { LightClientSyncIndicator } from '../../components/network/LightClientSyncIndicator';
+import { LightClientSyncIndicator } from '@/src/components/network/LightClientSyncIndicator';
 
-export const NetworkStatus: React.FC = () => {
+export default function NetworkStatus() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-zinc-900 dark:text-zinc-50">Network Status</h1>
@@ -17,4 +17,4 @@ export const NetworkStatus: React.FC = () => {
       </div>
     </div>
   );
-};
+}
